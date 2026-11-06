@@ -10,11 +10,12 @@ from pydantic import BaseModel, Field
 
 MODEL_ID = os.environ.get("TIMESFM_MODEL", "google/timesfm-3.0-pytorch")
 MAX_CONTEXT = int(os.environ.get("TIMESFM_MAX_CONTEXT", "2048"))
+ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
 
 app = FastAPI(title="SuperBrains Forecast API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[o.strip() for o in ALLOWED_ORIGINS if o.strip()],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -30,14 +31,26 @@ def get_forecaster():
     with _lock:
         if _forecaster is not None:
             return _forecaster
-        import torch
+        import torch  # noqa: F401 — ensures torch is importable before forecaster init
         from timesfm3 import TimesFM3Forecaster
 
-        device = "mps" if torch.backends.mps.is_available() else "cpu"
+        device = device_name()
         print(f"[superbrains] loading {MODEL_ID} on {device} ...", flush=True)
         _forecaster = TimesFM3Forecaster.from_pretrained(MODEL_ID, device=device)
         print("[superbrains] model ready", flush=True)
         return _forecaster
+
+
+def device_name() -> str:
+    try:
+        import torch
+        if torch.backends.mps.is_available():
+            return "mps"
+        if torch.cuda.is_available():
+            return "cuda"
+    except Exception:
+        pass
+    return "cpu"
 
 
 class ForecastRequest(BaseModel):

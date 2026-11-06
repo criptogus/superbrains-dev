@@ -1,0 +1,16 @@
+# Same-origin deploy: static site + /api/* proxy → forecast backend
+# Usage: caddy run --config deploy/Caddyfile  (or import in Caddyfile)
+
+superbrains.dev {
+	root * /srv/www
+	encode zstd gzip
+
+	# /api/forecast → backend /forecast (prefix stripped)
+	@api path /api/*
+	handle @api {
+		uri strip_prefix /api
+		reverse_proxy 127.0.0.1:8000
+	}
+
+	file_server
+}

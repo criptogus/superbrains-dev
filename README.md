@@ -40,12 +40,50 @@ O modelo (~1GB) baixa do HuggingFace no primeiro forecast e fica em cache.
   → gráfico com previsão + banda de confiança real (quantis 0.1–0.9)
 - Sem backend, o demo usa datasets simulados
 
+## Deploy (cloud)
+
+Everything is cloud-ready — no localhost assumptions in production.
+
+**Frontend (static):** any static host works (Vercel, Netlify, S3+CDN,
+nginx). In production the app calls same-origin `/api/forecast`, so you
+need either:
+
+- **Vercel:** the `api/forecast.js` serverless function is already included.
+  Set env `FORECAST_API_URL=https://<your-backend>` and deploy.
+- **Self-hosted (nginx/Caddy):** proxy `/api/*` → backend, stripping the
+  prefix. See `deploy/Caddyfile` for a working example.
+
+To point the frontend at a custom API URL instead, set
+`window.SUPERBRAINS_API_URL` before `app.js` loads.
+
+**Backend:**
+
+```bash
+cd backend
+docker build -t superbrains-api .
+docker run -p 8000:8000 -v hf-cache:/data/hf \
+  -e ALLOWED_ORIGINS=https://superbrains.dev \
+  -e TIMESFM_MODEL=google/timesfm-3.0-pytorch \
+  superbrains-api
+```
+
+Env vars: `PORT` (default 8000), `ALLOWED_ORIGINS` (comma-separated, default
+`*`), `TIMESFM_MODEL`, `TIMESFM_MAX_CONTEXT`, `HF_HOME` (model cache — mount
+a volume, ~1GB download on first run).
+
+Health check: `GET /health` → `{"status":"ok","model_loaded":bool}`.
+
 ## Upstream tracking
 
-`scripts/check_upstream.py` (rodado via cron) monitora
+`scripts/check_upstream.py` monitora
 [google-research/timesfm](https://github.com/google-research/timesfm) e o
 checkpoint `google/timesfm-3.0-pytorch` no Hugging Face. Quando há nova
 release, abre um PR automaticamente com o bump de versão.
+
+Agendado via **launchd** (`dev.superbrains.upstream-sync`, diário 08:30).
+O job roda num clone dedicado em `~/.local/share/superbrains-dev` porque
+launchd/cron não têm permissão de acessar `~/Documents` (TCC). Wrapper:
+`~/.local/bin/superbrains-upstream.sh`.
 
 ```bash
 python3 scripts/check_upstream.py            # check manual

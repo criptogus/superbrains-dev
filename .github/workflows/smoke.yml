@@ -1,0 +1,27 @@
+name: smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  api-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # CPU-only torch first so timesfm[torch] doesn't pull CUDA wheels
+      - name: Install CPU torch
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install deps
+        run: pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+
+      - name: Run smoke tests
+        run: python -m pytest backend/tests -q
+        working-directory: .

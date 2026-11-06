@@ -430,7 +430,9 @@
   renderDemo("bakery");
 
   /* ── CSV upload → real TimesFM forecast ──────── */
-  const API_URL = "http://localhost:8000";
+  // Local dev → backend direto. Cloud → same-origin /api/* (proxy/func serverless).
+  const isLocalHost = ["localhost", "127.0.0.1"].includes(location.hostname);
+  const API_URL = window.SUPERBRAINS_API_URL || (isLocalHost ? "http://localhost:8000" : "/api");
   const demoEl = document.querySelector(".demo");
   const statusEl = document.getElementById("demoStatus");
   const uploadBtn = document.getElementById("uploadBtn");
