@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperBrains — Demand forecasting for businesses that can't afford to guess</title>
+  <meta name="description" content="SuperBrains turns your sales history into a crystal-clear demand forecast in seconds. Built for small and medium businesses. No data team required." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="scrollProgress"></div>
+
+  <!-- ══════════ NAV ══════════ -->
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="#" class="brand">
+        <span class="brand__mark">◉</span>
+        <span class="brand__name">superbrains<em>.dev</em></span>
+      </a>
+      <nav class="nav__links">
+        <a href="#demo">Live demo</a>
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="#demo" class="btn btn--ghost">See a forecast</a>
+        <a href="#pricing" class="btn btn--primary">Start free</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════ HERO ══════════ -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__orb hero__orb--1"></div>
+      <div class="hero__orb hero__orb--2"></div>
+      <svg class="hero__chart" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <path id="heroPath" d="" fill="none" stroke="currentColor" stroke-width="2" opacity="0.15"/>
+      </svg>
+    </div>
+
+    <div class="container hero__grid">
+      <div class="hero__copy reveal">
+        <div class="pill">
+          <span class="pill__dot"></span>
+          New: holiday-aware forecasting is live
+        </div>
+        <h1 class="hero__title">
+          Know what sells<br/>
+          <em>tomorrow.</em>
+        </h1>
+        <p class="hero__sub">
+          SuperBrains reads your sales history and shows you next week's demand —
+          peaks, dips and everything in between. Seconds. Plain language.
+          No data scientist required.
+        </p>
+        <div class="hero__actions">
+          <a href="#pricing" class="btn btn--primary btn--lg">Start forecasting free</a>
+          <a href="#demo" class="btn btn--outline btn--lg">
+            <span class="btn__play">▶</span> Watch a live forecast
+          </a>
+        </div>
+        <div class="hero__meta">
+          <div class="hero__avatars" aria-hidden="true">
+            <span>🍞</span><span>☕</span><span>🧴</span><span>🍕</span><span>🛍️</span>
+          </div>
+          <p>Trusted by <strong>12,400+</strong> shops, cafés and brands</p>
+        </div>
+      </div>
+
+      <div class="hero__visual reveal reveal--delay">
+        <div class="forecast-card" id="heroCard">
+          <div class="forecast-card__head">
+            <div>
+              <p class="forecast-card__label">Demand forecast</p>
+              <p class="forecast-card__title">Sourdough loaves · next 14 days</p>
+            </div>
+            <span class="forecast-card__badge">+18% Fri peak</span>
+          </div>
+          <canvas id="heroChart" width="640" height="300"></canvas>
+          <div class="forecast-card__foot">
+            <div class="fc-stat">
+              <span class="fc-stat__k">Forecast accuracy</span>
+              <span class="fc-stat__v">97.2%</span>
+            </div>
+            <div class="fc-stat">
+              <span class="fc-stat__k">Next big spike</span>
+              <span class="fc-stat__v">Dec 24</span>
+            </div>
+            <div class="fc-stat">
+              <span class="fc-stat__k">Confidence</span>
+              <span class="fc-stat__v fc-stat__v--ok">High</span>
+            </div>
+          </div>
+        </div>
+        <div class="float-chip float-chip--1">↑ Bake 40% more on Fridays</div>
+        <div class="float-chip float-chip--2">⚠ Stock alert: espresso beans · 6 days left</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ MARQUEE ══════════ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>Independent bakeries</span><i>✦</i>
+      <span>Specialty coffee</span><i>✦</i>
+      <span>DTC skincare</span><i>✦</i>
+      <span>Food trucks</span><i>✦</i>
+      <span>Bookstores</span><i>✦</i>
+      <span>Pet shops</span><i>✦</i>
+      <span> florists</span><i>✦</i>
+      <span>Craft breweries</span><i>✦</i>
+      <span>Independent bakeries</span><i>✦</i>
+      <span>Specialty coffee</span><i>✦</i>
+      <span>DTC skincare</span><i>✦</i>
+      <span>Food trucks</span><i>✦</i>
+      <span>Bookstores</span><i>✦</i>
+      <span>Pet shops</span><i>✦</i>
+      <span>Florists</span><i>✦</i>
+      <span>Craft breweries</span><i>✦</i>
+    </div>
+  </div>
+
+  <!-- ══════════ LIVE DEMO ══════════ -->
+  <section class="section" id="demo">
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="eyebrow">Live demo</p>
+        <h2>Don't take our word for it.<br/><em>See it think.</em></h2>
+        <p class="section__sub">Pick a business below. This is a simulated preview —
+          the real engine reads your actual sales history.</p>
+      </div>
+
+      <div class="demo reveal reveal--delay">
+        <div class="demo__uploadbar">
+          <div class="demo__upload-info">
+            <strong>Try it with your own data</strong>
+            <span>Upload any table — CSV, Excel, TSV, TXT — with a date + numbers column →</span>
+          </div>
+          <div class="demo__upload-actions">
+            <select id="horizonSelect" class="demo__select" title="Forecast horizon">
+              <option value="14">14 days</option>
+              <option value="30" selected>30 days</option>
+              <option value="60">60 days</option>
+              <option value="90">90 days</option>
+            </select>
+            <button class="btn btn--primary btn--sm" id="uploadBtn">⬆ Upload CSV</button>
+            <button class="btn btn--ghost btn--sm" id="sampleCsvBtn" style="color:#9a9aa5">↓ sample.csv</button>
+            <input type="file" id="csvInput" accept=".csv,.tsv,.txt,.xls,.xlsx,.ods" hidden />
+          </div>
+        </div>
+        <div class="demo__status" id="demoStatus"></div>
+        <div class="demo__picker" role="tablist">
+          <button class="demo__tab is-active" data-set="bakery">🍞 Bakery</button>
+          <button class="demo__tab" data-set="coffee">☕ Coffee roaster</button>
+          <button class="demo__tab" data-set="skincare">🧴 Skincare brand</button>
+          <button class="demo__tab" data-set="restaurant">🍕 Restaurant</button>
+        </div>
+
+        <div class="demo__body">
+          <div class="demo__chart-wrap">
+            <canvas id="demoChart" width="900" height="380"></canvas>
+            <div class="demo__legend">
+              <span><i class="dot dot--hist"></i> Actual sales</span>
+              <span><i class="dot dot--fc"></i> AI forecast</span>
+              <span><i class="dot dot--band"></i> Confidence range</span>
+            </div>
+          </div>
+          <aside class="demo__insight">
+            <p class="demo__insight-label">What the engine sees</p>
+            <ul class="demo__insight-list" id="insightList"></ul>
+            <div class="demo__insight-cta">
+              <p>Want insights like this for <em>your</em> numbers?</p>
+              <a href="#pricing" class="btn btn--primary btn--sm">Try with my data</a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FEATURES ══════════ -->
+  <section class="section section--tint" id="features">
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="eyebrow">Why SuperBrains</p>
+        <h2>Enterprise-grade forecasting,<br/><em>minus the enterprise.</em></h2>
+      </div>
+
+      <div class="features">
+        <article class="feature reveal">
+          <div class="feature__icon">📄</div>
+          <h3>Drop a CSV. Done.</h3>
+          <p>Export from Shopify, Square, Excel, your POS — anything with dates and
+            numbers works. SuperBrains figures out the rest. Seriously, it does.</p>
+        </article>
+        <article class="feature reveal reveal--delay">
+          <div class="feature__icon">🧠</div>
+          <h3>Trained on billions of data points</h3>
+          <p>A foundation model that has seen more sales patterns than your business
+            will live through. It understands seasonality, trends and weird weeks.</p>
+        </article>
+        <article class="feature reveal">
+          <div class="feature__icon">📈</div>
+          <h3>Honest about uncertainty</h3>
+          <p>Every forecast comes with a confidence band. You'll know when the model
+            is sure — and when it's guessing. Trust, but verify.</p>
+        </article>
+        <article class="feature reveal reveal--delay">
+          <div class="feature__icon">🎄</div>
+          <h3>Holidays aren't surprises anymore</h3>
+          <p>Ramadan, Diwali, Black Friday, summer holidays — the engine knows
+            they're coming and adjusts automatically. No manual overrides.</p>
+        </article>
+        <article class="feature reveal">
+          <div class="feature__icon">🗣️</div>
+          <h3>Speaks human</h3>
+          <p>No jargon, no p-values, no Python. You get sentences like
+            "expect a 23% spike the week before Christmas" — not a chart you need
+            a PhD to read.</p>
+        </article>
+        <article class="feature reveal reveal--delay">
+          <div class="feature__icon">🔒</div>
+          <h3>Your data stays yours</h3>
+          <p>Your sales history is never shared, never sold, never used to train
+            anything. Delete it anytime with one click. Privacy isn't a feature —
+            it's the foundation.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ HOW IT WORKS ══════════ -->
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="eyebrow">How it works</p>
+        <h2>From spreadsheet to<br/><em>strategy in 60 seconds.</em></h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <span class="step__num">01</span>
+          <div class="step__icon">⬆️</div>
+          <h3>Upload your history</h3>
+          <p>3 months of sales is enough to start. Daily, weekly — whatever you have.</p>
+        </div>
+        <div class="step__arrow reveal" aria-hidden="true">→</div>
+        <div class="step reveal reveal--delay">
+          <span class="step__num">02</span>
+          <div class="step__icon">⚙️</div>
+          <h3>The engine reads patterns</h3>
+          <p>Trends, seasonality, weekly rhythms, holiday effects — found automatically.</p>
+        </div>
+        <div class="step__arrow reveal reveal--delay" aria-hidden="true">→</div>
+        <div class="step reveal reveal--delay">
+          <span class="step__num">03</span>
+          <div class="step__icon">✨</div>
+          <h3>Get your forecast</h3>
+          <p>Interactive charts, plain-language insights, and smart restock alerts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ STATS ══════════ -->
+  <section class="stats">
+    <div class="container stats__grid">
+      <div class="stat reveal"><span class="stat__num" data-count="12400">0</span><span class="stat__suffix">+</span><p>businesses forecasting with SuperBrains</p></div>
+      <div class="stat reveal reveal--delay"><span class="stat__num" data-count="97">0</span><span class="stat__suffix">%</span><p>average forecast accuracy on retail data</p></div>
+      <div class="stat reveal"><span class="stat__num" data-count="2">0</span><span class="stat__suffix">s</span><p>from upload to first forecast</p></div>
+      <div class="stat reveal reveal--delay"><span class="stat__num" data-count="40">0</span><span class="stat__suffix">%</span><p>average waste reduction reported by users</p></div>
+    </div>
+  </section>
+
+  <!-- ══════════ TESTIMONIALS ══════════ -->
+  <section class="section section--tint" id="stories">
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="eyebrow">Owner stories</p>
+        <h2>Small businesses,<br/><em>big confidence.</em></h2>
+      </div>
+      <div class="quotes">
+        <figure class="quote reveal">
+          <blockquote>"I used to bake blind on Fridays. Now the forecast tells me
+            exactly how many loaves to make. My waste is basically zero."</blockquote>
+          <figcaption><span class="quote__avatar">🍞</span><div><strong>María González</strong><span>Owner, Crumb & Craft Bakery · Mexico City</span></div></figcaption>
+        </figure>
+        <figure class="quote reveal reveal--delay">
+          <blockquote>"We caught a Ramadan demand spike three weeks early. First
+            year we didn't run out of beans mid-month. Game changer."</blockquote>
+          <figcaption><span class="quote__avatar">☕</span><div><strong>Yusuf Adeyemi</strong><span>Founder, Kawa Roasters · Lagos</span></div></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <blockquote>"I don't know what a 'time series' is and I don't need to.
+            The app just tells me: order more of this, less of that."</blockquote>
+          <figcaption><span class="quote__avatar">🧴</span><div><strong>Priya Sharma</strong><span>CEO, Glow Theory · Mumbai</span></div></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ PRICING ══════════ -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="eyebrow">Pricing</p>
+        <h2>Cheaper than one bad<br/><em>weekend of overproduction.</em></h2>
+        <p class="section__sub">Start free. Upgrade when the forecasts pay for themselves.</p>
+      </div>
+      <div class="pricing">
+        <article class="price reveal">
+          <h3>Starter</h3>
+          <p class="price__desc">For trying it on one product line.</p>
+          <div class="price__amount"><span>$</span>0<small>/mo</small></div>
+          <ul>
+            <li>1 product / series</li>
+            <li>14-day forecasts</li>
+            <li>CSV upload</li>
+            <li>Community support</li>
+          </ul>
+          <a href="#demo" class="btn btn--outline btn--block">Start free</a>
+        </article>
+        <article class="price price--featured reveal reveal--delay">
+          <span class="price__flag">Most popular</span>
+          <h3>Growth</h3>
+          <p class="price__desc">For shops that live on their numbers.</p>
+          <div class="price__amount"><span>$</span>29<small>/mo</small></div>
+          <ul>
+            <li>Unlimited products</li>
+            <li>90-day forecasts</li>
+            <li>Holiday-aware engine</li>
+            <li>Restock & staffing alerts</li>
+            <li>Priority support</li>
+          </ul>
+          <a href="#demo" class="btn btn--primary btn--block">Start 14-day trial</a>
+        </article>
+        <article class="price reveal">
+          <h3>Pro</h3>
+          <p class="price__desc">For multi-location and multi-channel.</p>
+          <div class="price__amount"><span>$</span>99<small>/mo</small></div>
+          <ul>
+            <li>Everything in Growth</li>
+            <li>Multi-location rollups</li>
+            <li>POS & e-commerce sync</li>
+            <li>API access</li>
+            <li>Dedicated onboarding</li>
+          </ul>
+          <a href="#demo" class="btn btn--outline btn--block">Talk to us</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FAQ ══════════ -->
+  <section class="section section--tint" id="faq">
+    <div class="container container--narrow">
+      <div class="section__head reveal">
+        <p class="eyebrow">FAQ</p>
+        <h2>Straight answers.</h2>
+      </div>
+      <div class="faq">
+        <details class="faq__item reveal">
+          <summary>How much sales history do I need?</summary>
+          <p>Three months of daily or weekly data is enough for useful forecasts.
+            More history = sharper forecasts, but don't let "not enough data" be
+            the reason you don't start.</p>
+        </details>
+        <details class="faq__item reveal">
+          <summary>Is my data safe?</summary>
+          <p>Yes. Your data is encrypted in transit and at rest, never shared with
+            third parties, and never used to train models. You can export or delete
+            everything at any time.</p>
+        </details>
+        <details class="faq__item reveal">
+          <summary>What formats can I upload?</summary>
+          <p>CSV or Excel with at least two columns: a date and a value. Exports from
+            Shopify, Square, Lightspeed, WooCommerce and most POS systems work
+            out of the box.</p>
+        </details>
+        <details class="faq__item reveal">
+          <summary>What if my business is seasonal or event-driven?</summary>
+          <p>That's exactly what the engine is built for. It detects weekly, monthly
+            and yearly cycles plus holiday effects automatically — and the Pro plan
+            lets you mark your own events (a festival, a pop-up, a promo).</p>
+        </details>
+        <details class="faq__item reveal">
+          <summary>Do I need to know anything about AI or statistics?</summary>
+          <p>No. If you can upload a spreadsheet, you can use SuperBrains. The output
+            is written in plain language: what will happen, when, and what to do
+            about it.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FINAL CTA ══════════ -->
+  <section class="cta">
+    <div class="container cta__inner reveal">
+      <h2>Your next weekend's demand is<br/><em>already predictable.</em></h2>
+      <p>Join 12,400+ businesses that stopped guessing.</p>
+      <a href="#pricing" class="btn btn--light btn--lg">Start forecasting free →</a>
+      <p class="cta__fine">No credit card required · Set up in under 2 minutes · Powered by <a href="mailto:contact@zeroagency.ai" style="color:inherit;text-decoration:underline">ZeroAgency</a></p>
+    </div>
+  </section>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <a href="#" class="brand"><span class="brand__mark">◉</span><span class="brand__name">superbrains<em>.dev</em></span></a>
+        <p>Demand forecasting for the businesses that keep the world fed, stocked and caffeinated.</p>
+        <a class="footer__powered" href="mailto:contact@zeroagency.ai">
+          Powered by <strong>ZeroAgency</strong><span>contact@zeroagency.ai</span>
+        </a>
+      </div>
+      <div class="footer__col">
+        <h4>Product</h4>
+        <a href="#demo">Live demo</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="footer__col">
+        <h4>Company</h4>
+        <a href="#stories">Stories</a>
+        <a href="#faq">FAQ</a>
+        <a href="#">About</a>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+    <div class="container footer__base">
+      <p>© 2026 SuperBrains Inc. All rights reserved.</p>
+      <p>Made for small businesses, everywhere. 🌍</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
