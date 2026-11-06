@@ -1,7 +1,7 @@
 # Same-origin deploy: static site + /api/* proxy → forecast backend
-# Usage: caddy run --config deploy/Caddyfile  (or import in Caddyfile)
+# $SITE_ADDRESS comes from the container env (default: superbrains.dev)
 
-superbrains.dev {
+{$SITE_ADDRESS:superbrains.dev} {
 	root * /srv/www
 	encode zstd gzip
 
@@ -9,7 +9,13 @@ superbrains.dev {
 	@api path /api/*
 	handle @api {
 		uri strip_prefix /api
-		reverse_proxy 127.0.0.1:8000
+		reverse_proxy api:8000
+	}
+
+	# cheap health passthrough for uptime checks
+	@health path /health
+	handle @health {
+		reverse_proxy api:8000
 	}
 
 	file_server

@@ -50,8 +50,29 @@ need either:
 
 - **Vercel:** the `api/forecast.js` serverless function is already included.
   Set env `FORECAST_API_URL=https://<your-backend>` and deploy.
-- **Self-hosted (nginx/Caddy):** proxy `/api/*` → backend, stripping the
-  prefix. See `deploy/Caddyfile` for a working example.
+- **Self-hosted single VPS (Hetzner, etc.) — recommended:**
+
+```bash
+# on the server, from the repo root:
+cd deploy
+docker compose up -d --build
+```
+
+One `docker-compose.yml` runs both containers:
+
+- `api` — FastAPI + TimesFM (Dockerfile in `backend/`, CPU torch, model
+  weights cached in the `hf-cache` volume)
+- `web` — Caddy serving the static site and proxying `/api/*` → `api:8000`,
+  with automatic HTTPS
+
+Before starting: point your domain's DNS A record to the server IP, then set
+`SITE_ADDRESS`/`ALLOWED_ORIGINS` if the domain isn't `superbrains.dev`.
+
+Hetzner sizing: **CX22 (2 vCPU / 4 GB)** handles the demo fine — inference is
+~1–3s per forecast on CPU. Go **CX32/CCX13** if you expect concurrent users.
+
+Manual Caddy alternative (without compose): `deploy/Caddyfile` works with any
+Caddy install — just adjust the `reverse_proxy` target.
 
 To point the frontend at a custom API URL instead, set
 `window.SUPERBRAINS_API_URL` before `app.js` loads.

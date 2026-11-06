@@ -1,0 +1,53 @@
+# SuperBrains — single-VPS deploy (front + back on Hetzner or any Docker host)
+#
+#   cd deploy && docker compose up -d --build
+#
+# Requirements:
+#   - DNS A record for your domain → this server's IP
+#   - Ports 80/443 open (Caddy gets Let's Encrypt certs automatically)
+#
+# The site calls /api/forecast → Caddy strips /api → backend /forecast.
+
+services:
+  api:
+    build: ../backend
+    restart: unless-stopped
+    environment:
+      PORT: "8000"
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://superbrains.dev,https://www.superbrains.dev}
+      TIMESFM_MODEL: ${TIMESFM_MODEL:-google/timesfm-3.0-pytorch}
+      HF_HOME: /data/hf
+    volumes:
+      - hf-cache:/data/hf   # ~1GB model weights, downloaded once
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s    # first boot downloads the model
+
+  web:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-superbrains.dev}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # only the public assets — backend source is NOT exposed
+      - ../index.html:/srv/www/index.html:ro
+      - ../styles.css:/srv/www/styles.css:ro
+      - ../app.js:/srv/www/app.js:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+
+volumes:
+  hf-cache:
+  caddy-data:
+  caddy-config:
