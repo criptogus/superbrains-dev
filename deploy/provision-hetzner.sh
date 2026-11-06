@@ -8,19 +8,23 @@ set -euo pipefail
 NAME="${1:-superbrains-prod}"
 LOC="${2:-nbg1}"
 IMAGE="ubuntu-24.04"
-TYPE="cx22"          # 2 vCPU / 4 GB / ~€3.79 — bump to cx32 for more headroom
+TYPE="cpx22"          # 2 vCPU / 4 GB / ~€3.79 — bump to cx32 for more headroom
 SSH_KEY_FILE="${SSH_KEY_FILE:-$HOME/.ssh/superbrains_hetzner.pub}"
 TOKEN="${HCLOUD_TOKEN:?set HCLOUD_TOKEN}"
 export HCLOUD_TOKEN="$TOKEN"
 
 echo "==> context check"
-hcloud context create superbrains --token "$TOKEN" 2>/dev/null || true
+hcloud context create superbrains --token-from-env 2>/dev/null || true
 hcloud context use superbrains >/dev/null
 
 echo "==> ssh key"
-KEY_NAME="superbrains-deploy-$(date +%s)"
-hcloud ssh-key create --name "$KEY_NAME" --public-key-from-file "$SSH_KEY_FILE" >/dev/null
-echo "    created $KEY_NAME"
+KEY_NAME="superbrains-deploy"
+if ! hcloud ssh-key describe "$KEY_NAME" >/dev/null 2>&1; then
+  hcloud ssh-key create --name "$KEY_NAME" --public-key-from-file "$SSH_KEY_FILE" >/dev/null
+  echo "    created $KEY_NAME"
+else
+  echo "    reusing $KEY_NAME"
+fi
 
 echo "==> firewall (80/443/22 only)"
 hcloud firewall create --name superbrains-fw >/dev/null 2>&1 || true
