@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY server.py .
+COPY server.py db.py .
 
 ENV PORT=8000 \
     HF_HOME=/data/hf

@@ -68,6 +68,25 @@ One `docker-compose.yml` runs both containers:
 Before starting: point your domain's DNS A record to the server IP, then set
 `SITE_ADDRESS`/`ALLOWED_ORIGINS` if the domain isn't `superbrains.dev`.
 
+### Accounts, billing & email
+
+The API includes magic-link auth (SQLite in the `app-data` volume), saved
+forecasts, Stripe subscriptions and a first-party analytics beacon.
+
+Copy `deploy/.env.example` → `deploy/.env` and fill in:
+
+| Var | Purpose |
+|---|---|
+| `STRIPE_SECRET_KEY` | Stripe secret key (dashboard → Developers → API keys) |
+| `STRIPE_WEBHOOK_SECRET` | webhook signing secret — endpoint `POST /api/billing/webhook`, events: `checkout.session.completed`, `customer.subscription.*` |
+| `STRIPE_PRICE_GROWTH` / `STRIPE_PRICE_SCALE` | recurring monthly price IDs ($29 / $99) |
+| `RESEND_API_KEY` / `RESEND_FROM` | Resend.com key for login-link emails; without it, links are printed to container logs and returned as `dev_link` |
+| `FREE_FORECAST_LIMIT` | saved forecasts allowed on the free plan (default 5) |
+
+Ops scripts (already cron'd on the prod server): `scripts/healthcheck.sh`
+every 5 min → `/var/log/superbrains-health.log`; `scripts/backup.sh` daily
+03:17 → `/opt/backups/superbrains` (14-day retention).
+
 Hetzner sizing: **CX22 (2 vCPU / 4 GB)** handles the demo fine — inference is
 ~1–3s per forecast on CPU. Go **CX32/CCX13** if you expect concurrent users.
 

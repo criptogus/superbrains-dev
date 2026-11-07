@@ -5,8 +5,9 @@
 # Requirements:
 #   - DNS A record for your domain → this server's IP
 #   - Ports 80/443 open (Caddy gets Let's Encrypt certs automatically)
+#   - Secrets in deploy/.env (see .env.example)
 #
-# The site calls /api/forecast → Caddy strips /api → backend /forecast.
+# The site calls /api/* → Caddy strips /api → backend routes.
 
 services:
   api:
@@ -17,8 +18,20 @@ services:
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://superbrains.dev,https://www.superbrains.dev}
       TIMESFM_MODEL: ${TIMESFM_MODEL:-google/timesfm-3.0-pytorch}
       HF_HOME: /data/hf
+      DATA_DIR: /data/app
+      APP_URL: ${APP_URL:-https://superbrains.dev}
+      FREE_FORECAST_LIMIT: ${FREE_FORECAST_LIMIT:-5}
+      # billing (Stripe)
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_GROWTH: ${STRIPE_PRICE_GROWTH:-}
+      STRIPE_PRICE_SCALE: ${STRIPE_PRICE_SCALE:-}
+      # transactional email (Resend)
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-SuperBrains <login@superbrains.dev>}
     volumes:
       - hf-cache:/data/hf   # ~1GB model weights, downloaded once
+      - app-data:/data/app  # SQLite: users, sessions, forecasts
     expose:
       - "8000"
     healthcheck:
@@ -42,6 +55,11 @@ services:
       - ../index.html:/srv/www/index.html:ro
       - ../styles.css:/srv/www/styles.css:ro
       - ../app.js:/srv/www/app.js:ro
+      - ../app.html:/srv/www/app.html:ro
+      - ../app-ui.js:/srv/www/app-ui.js:ro
+      - ../app-ui.css:/srv/www/app-ui.css:ro
+      - ../privacy.html:/srv/www/privacy.html:ro
+      - ../terms.html:/srv/www/terms.html:ro
       - caddy-data:/data
       - caddy-config:/config
     depends_on:
@@ -49,5 +67,6 @@ services:
 
 volumes:
   hf-cache:
+  app-data:
   caddy-data:
   caddy-config:

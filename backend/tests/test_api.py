@@ -52,3 +52,51 @@ def test_real_forecast():
     assert len(body["forecast"]) == 12
     assert len(body["quantiles"]) == 12
     assert len(body["quantiles"][0]) == 9
+
+
+# ── auth / app endpoints (dev mode: no RESEND_API_KEY → dev_link returned) ──
+
+
+def _login(email="test@example.com"):
+    r = client.post("/auth/request", json={"email": email})
+    assert r.status_code == 200, r.text
+    link = r.json()["dev_link"]
+    token = link.split("token=")[1]
+    r = client.post("/auth/verify", json={"token": token})
+    assert r.status_code == 200, r.text
+    return r.json()["session"]
+
+
+def test_auth_flow_and_forecast_save():
+    session = _login()
+    auth = {"Authorization": f"Bearer {session}"}
+
+    assert client.get("/me").status_code == 401
+    me = client.get("/me", headers=auth)
+    assert me.status_code == 200
+    assert me.json()["email"] == "test@example.com"
+
+    r = client.post(
+        "/forecasts",
+        headers=auth,
+        json={
+            "name": "Bakery daily",
+            "horizon": 14,
+            "values": list(range(20)),
+            "forecast": [21.0] * 14,
+            "quantiles": [[20.0] * 9] * 14,
+        },
+    )
+    assert r.status_code == 200, r.text
+    fid = r.json()["id"]
+
+    lst = client.get("/forecasts", headers=auth).json()["forecasts"]
+    assert any(f["id"] == fid for f in lst)
+
+    detail = client.get(f"/forecasts/{fid}", headers=auth).json()
+    assert detail["payload"]["forecast"] == [21.0] * 14
+
+
+def test_events_beacon():
+    r = client.post("/events", json={"event": "pageview", "path": "/"})
+    assert r.status_code == 200
